@@ -1,7 +1,7 @@
 package main
 
-import "fmt"
+import "github.com/chris-cmsoft/knein/cmd"
 
 func main() {
-	fmt.Println("knein")
+	cmd.Execute()
 }

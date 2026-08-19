@@ -1,12 +1,11 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"os"
 
-	"github.com/chris-cmsoft/knein/internal/kubecontexts"
-	"github.com/chris-cmsoft/knein/internal/picker"
+	kubecontext "github.com/chris-cmsoft/gotool-kubecontext-picker"
+	"github.com/chris-cmsoft/knein/internal/k9s"
 	"github.com/spf13/cobra"
 )
 
@@ -25,27 +24,26 @@ func Execute() {
 
 func newRootCommand() *cobra.Command {
 	opts := rootOptions{
-		limit: 9,
+		limit: kubecontext.DefaultLimit,
 	}
 
 	cmd := &cobra.Command{
-		Use:   "knein",
-		Short: "Open k9s for a Kubernetes context",
-		Args:  cobra.NoArgs,
+		Use:           "knein",
+		Short:         "Open k9s for a Kubernetes context",
+		Args:          cobra.NoArgs,
+		SilenceErrors: true,
+		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if opts.limit < 1 {
-				return errors.New("limit must be greater than 0")
+				return kubecontext.ErrInvalidLimit
 			}
 
-			contexts, err := kubecontexts.Load(opts.kubeconfig)
+			contexts, err := kubecontext.Load(opts.kubeconfig)
 			if err != nil {
 				return err
 			}
-			if len(contexts) == 0 {
-				return errors.New("no Kubernetes contexts found")
-			}
 
-			selected, err := picker.SelectContext(contexts, opts.limit)
+			selected, err := kubecontext.Select(contexts, opts.limit)
 			if err != nil {
 				return err
 			}
@@ -53,7 +51,7 @@ func newRootCommand() *cobra.Command {
 				return nil
 			}
 
-			return picker.OpenK9s(selected)
+			return k9s.Open(selected)
 		},
 	}
 

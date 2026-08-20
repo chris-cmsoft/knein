@@ -5,11 +5,37 @@ Terminal CLI to search for contexts and then open k9s with the selected context
 > [!NOTE]  
 > This was fully vibe coded to make my life easier working with many contexts. 
 
-## Installation 
+## Installation
 
+### Download a binary
+
+Every release attaches a binary per platform, so no Go toolchain is needed:
+
+```console
+curl -fsSL -o knein https://github.com/chris-cmsoft/knein/releases/latest/download/knein_darwin_arm64
+chmod +x knein
+mv knein /usr/local/bin/knein
 ```
+
+Swap `darwin_arm64` for `darwin_amd64`, `linux_amd64` or `linux_arm64`. Each
+release also ships `checksums.txt`:
+
+```console
+sha256sum -c checksums.txt --ignore-missing
+```
+
+If you download through a browser instead of `curl`, macOS quarantines the file
+and refuses to run it. Clear the flag with
+`xattr -d com.apple.quarantine knein`.
+
+### With Go
+
+```console
 go install github.com/chris-cmsoft/knein@latest
 ```
+
+Or build locally with `make build`, or cross compile every released target into
+`dist/` with `make dist`.
 
 ## Usage
 

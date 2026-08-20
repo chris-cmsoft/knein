@@ -63,3 +63,17 @@ fmt: ## Go FMT
 build: ## Build the cli
 	@mkdir -p bin
 	@go build -o bin/knein main.go
+
+.PHONY: dist
+dist: ## Cross compile the targets the release workflow publishes
+	@mkdir -p dist
+	@for target in darwin/arm64 darwin/amd64 linux/amd64 linux/arm64; do \
+		goos="$${target%/*}"; goarch="$${target#*/}"; \
+		echo "building $$goos/$$goarch"; \
+		CGO_ENABLED=0 GOOS="$$goos" GOARCH="$$goarch" go build \
+			-trimpath -ldflags "-s -w" -o "dist/knein_$${goos}_$${goarch}" . || exit 1; \
+	done
+
+.PHONY: clean
+clean: ## Remove build output
+	@rm -rf bin dist

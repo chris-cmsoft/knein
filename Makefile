@@ -58,11 +58,14 @@ test: ## Go Test
 fmt: ## Go FMT
 	@go fmt ./...
 
+VERSION ?= $(shell git describe --tags --dirty=+dirty --always 2>/dev/null || echo dev)
+LDFLAGS := -s -w -X github.com/chris-cmsoft/knein/internal/version.version=$(VERSION)
+
 ##@ Run
 .PHONY: build
 build: ## Build the cli
 	@mkdir -p bin
-	@go build -o bin/knein main.go
+	@go build -trimpath -ldflags "$(LDFLAGS)" -o bin/knein .
 
 .PHONY: dist
 dist: ## Cross compile the targets the release workflow publishes
@@ -71,7 +74,7 @@ dist: ## Cross compile the targets the release workflow publishes
 		goos="$${target%/*}"; goarch="$${target#*/}"; \
 		echo "building $$goos/$$goarch"; \
 		CGO_ENABLED=0 GOOS="$$goos" GOARCH="$$goarch" go build \
-			-trimpath -ldflags "-s -w" -o "dist/knein_$${goos}_$${goarch}" . || exit 1; \
+			-trimpath -ldflags "$(LDFLAGS)" -o "dist/knein_$${goos}_$${goarch}" . || exit 1; \
 	done
 
 .PHONY: clean

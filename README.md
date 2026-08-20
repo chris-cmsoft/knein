@@ -49,6 +49,25 @@ $ knein
 | --- | --- | --- |
 | `--kubeconfig` | standard resolution (`$KUBECONFIG`, then `~/.kube/config`) | Path to the kubeconfig to read contexts from. |
 | `--limit` | `9` | Maximum contexts the picker shows at once. |
+| `--version` | | Print the running build and the newest release. |
+
+## Version
+
+`--version` prints the running build and asks GitHub for the newest release:
+
+```console
+$ knein --version
+knein   v0.1.1
+latest  v0.1.2 (https://github.com/chris-cmsoft/knein/releases/latest)
+```
+
+When the two match, the second line reads `up to date` instead. The lookup is
+best effort: with no network it reports `latest  unknown (...)` and still prints
+the running version.
+
+Release builds are stamped with their tag. Builds from source report what
+`git describe` says, and `go install` builds report the module version Go
+records in the binary.
 
 ## Architecture
 

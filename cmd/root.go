@@ -6,12 +6,14 @@ import (
 
 	kubecontext "github.com/chris-cmsoft/gotool-kubecontext-picker"
 	"github.com/chris-cmsoft/knein/internal/k9s"
+	"github.com/chris-cmsoft/knein/internal/version"
 	"github.com/spf13/cobra"
 )
 
 type rootOptions struct {
 	kubeconfig string
 	limit      int
+	version    bool
 }
 
 // Execute runs the root command.
@@ -34,6 +36,10 @@ func newRootCommand() *cobra.Command {
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if opts.version {
+				return version.Report(cmd.Context(), cmd.OutOrStdout())
+			}
+
 			if opts.limit < 1 {
 				return kubecontext.ErrInvalidLimit
 			}
@@ -57,6 +63,7 @@ func newRootCommand() *cobra.Command {
 
 	cmd.Flags().StringVar(&opts.kubeconfig, "kubeconfig", "", "Path to kubeconfig file")
 	cmd.Flags().IntVar(&opts.limit, "limit", opts.limit, "Maximum contexts to show")
+	cmd.Flags().BoolVar(&opts.version, "version", false, "Show the running and latest released version")
 
 	return cmd
 }
